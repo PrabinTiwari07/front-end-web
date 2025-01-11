@@ -13,7 +13,7 @@ const HomePage = () => {
                     Welcome to the Home Page
                 </h1>
                 <Link
-                    to="/login"
+                    to="/authentication"
                     aria-label="Navigate to Login Page"
                     className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                 >
@@ -21,7 +21,6 @@ const HomePage = () => {
                 </Link>
             </main>
 
-            {/* Footer Section */}
             <Footer />
         </div>
     );
