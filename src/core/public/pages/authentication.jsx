@@ -1,3 +1,7 @@
+
+import React, { useState } from 'react';
+import LoginPage from "../../../components/login.jsx";
+import SignupPage from "../../../components/signup.jsx";
 const Authentication = () => {
     const [isLogin, setIsLogin] = useState(true);
 
