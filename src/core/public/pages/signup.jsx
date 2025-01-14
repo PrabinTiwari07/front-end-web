@@ -1,80 +1,99 @@
-import React from 'react';
+import React from "react";
+import { Link } from "react-router-dom";
 
-const SingnUp = () => {
+const SignUp = () => {
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-100">
-            <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
-                <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">Login</h2>
-
+        <div className="min-h-screen flex items-center justify-center bg-gray-300">
+            <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+                <h1 className="text-center text-2xl font-bold text-gray-800 mb-6">CleanEase</h1>
+                <h2 className="text-center text-lg font-semibold text-gray-600 mb-4">
+                    Create your account
+                </h2>
                 <form>
+                    {/* Full Name Field */}
                     <div className="mb-4">
-                        <label
-                            htmlFor="email"
-                            className="block text-sm font-medium text-gray-600 mb-1"
+                        <input
+                            type="text"
+                            placeholder="Enter your fullname"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 outline-none focus:ring-2 focus:ring-teal-400"
+                            required
+                        />
+                    </div>
+
+                    {/* Address Field */}
+                    <div className="mb-4">
+                        <input
+                            type="text"
+                            placeholder="Enter your address"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 outline-none focus:ring-2 focus:ring-teal-400"
+                            required
+                        />
+                    </div>
+
+                    {/* Gender Dropdown */}
+                    <div className="mb-4">
+                        <select
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 outline-none focus:ring-2 focus:ring-teal-400"
+                            required
                         >
-                            Email Address
-                        </label>
+                            <option value="" disabled selected>
+                                Select your gender
+                            </option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    {/* Email Field */}
+                    <div className="mb-4">
                         <input
                             type="email"
-                            id="email"
-                            name="email"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
                             placeholder="Enter your email"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 outline-none focus:ring-2 focus:ring-teal-400"
                             required
                         />
                     </div>
 
-                    <div className="mb-6">
-                        <label
-                            htmlFor="password"
-                            className="block text-sm font-medium text-gray-600 mb-1"
-                        >
-                            Password
-                        </label>
+                    {/* Password Field */}
+                    <div className="mb-4">
                         <input
                             type="password"
-                            id="password"
-                            name="password"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
                             placeholder="Enter your password"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 outline-none focus:ring-2 focus:ring-teal-400"
                             required
                         />
                     </div>
 
+                    {/* Confirm Password Field */}
                     <div className="mb-6">
-                        <label
-                            htmlFor="confirm password"
-                            className="block text-sm font-medium text-gray-600 mb-1"
-                        >
-                            Password
-                        </label>
                         <input
                             type="password"
-                            id="password"
-                            name="confirm password"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                            placeholder="Enter your password"
+                            placeholder="Confirm your password"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 outline-none focus:ring-2 focus:ring-teal-400"
                             required
                         />
                     </div>
 
+                    {/* Submit Button */}
                     <button
                         type="submit"
-                        className="w-full py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 focus:outline-none"
+                        className="w-full py-2 bg-teal-400 text-white font-semibold rounded-md hover:bg-teal-500"
                     >
-                        Login
+                        Sign up
                     </button>
                 </form>
 
-                <p className="text-sm text-center text-gray-500 mt-4">
-                    Don't have an account?{' '}
-                    <a href="/register" className="text-blue-500 hover:underline">
-                        Sign up
-                    </a>
+                {/* Login Link */}
+                <p className="text-center text-sm text-gray-600 mt-4">
+                    Already have an account?{" "}
+                    <Link to="/login" className="text-teal-500 font-semibold hover:underline">
+                        Log in
+                    </Link>
                 </p>
             </div>
         </div>
     );
 };
 
-export default SingnUp;
+export default SignUp;
