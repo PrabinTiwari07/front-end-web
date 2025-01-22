@@ -33,7 +33,6 @@ const HomePage = () => {
             {/* Navbar */}
             <Navbar />
 
-            {/* Main Content */}
             <main className="bg-gray-100">
                 {/* Hero Section */}
                 <Hero />
