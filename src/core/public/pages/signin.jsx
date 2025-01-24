@@ -1,12 +1,52 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // Import Link and useNavigate
+import { Link, useNavigate } from "react-router-dom";
 
 const Signin = () => {
     const [showPassword, setShowPassword] = useState(false);
-    const navigate = useNavigate(); // Hook for programmatic navigation
+    const [email, setEmail] = useState("");  // To store the email input value
+    const [password, setPassword] = useState("");  // To store the password input value
+    const [error, setError] = useState("");  // To store any error message
+    const navigate = useNavigate();
 
     const togglePasswordVisibility = () => {
         setShowPassword((prevState) => !prevState);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // Prepare the login data
+        const loginData = {
+            email: email,
+            password: password,
+        };
+
+        try {
+            // Send POST request to backend for login
+            const response = await fetch("http://localhost:3000/api/users/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(loginData),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // On success, save the token in localStorage (or sessionStorage)
+                localStorage.setItem("userToken", data.token);
+
+                // Redirect to homepage
+                navigate("/"); // Replace with your homepage route
+            } else {
+                // Show error message if login fails
+                setError(data.message || "Login failed. Please try again.");
+            }
+        } catch (error) {
+            setError("Error occurred during login. Please try again.");
+            console.error("Login error:", error);
+        }
     };
 
     return (
@@ -20,7 +60,14 @@ const Signin = () => {
                     Please sign in to your account to continue.
                 </p>
 
-                <form>
+                {/* Show error message if any */}
+                {error && (
+                    <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
+                        {error}
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit}>
                     {/* Email Input */}
                     <div className="form-control mb-6">
                         <label className="label">
@@ -30,6 +77,8 @@ const Signin = () => {
                             type="email"
                             placeholder="Enter your email"
                             className="input input-bordered focus:outline-none focus:ring-2 focus:ring-teal-500"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             required
                         />
                     </div>
@@ -44,6 +93,8 @@ const Signin = () => {
                                 type={showPassword ? "text" : "password"}
                                 placeholder="Enter your password"
                                 className="input input-bordered focus:outline-none focus:ring-2 focus:ring-teal-500 w-full pr-10"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 required
                             />
                             <span
@@ -114,7 +165,10 @@ const Signin = () => {
 
                     {/* Login Button */}
                     <div className="form-control">
-                        <button className="btn bg-teal-500 hover:bg-teal-600 text-white border-0 w-full">
+                        <button
+                            type="submit"
+                            className="btn bg-teal-500 hover:bg-teal-600 text-white border-0 w-full"
+                        >
                             Login
                         </button>
                     </div>
