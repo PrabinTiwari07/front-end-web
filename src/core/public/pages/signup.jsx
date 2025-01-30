@@ -10,96 +10,109 @@ const SignUp = () => {
         phone: "",
         email: "",
         password: "",
-        // confirm_password: "",
+        confirm_password: "",
+        profilePicture: null,
     });
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
     const [verificationCode, setVerificationCode] = useState("");
     const [emailVerified, setEmailVerified] = useState(false);
+    const [previewImage, setPreviewImage] = useState(null);
 
     const navigate = useNavigate();
 
-    const togglePasswordVisibility = () => {
-        setShowPassword((prevState) => !prevState);
-    };
+    const togglePasswordVisibility = () => setShowPassword(!showPassword);
+    const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
 
-    const toggleConfirmPasswordVisibility = () => {
-        setShowConfirmPassword((prevState) => !prevState);
-    };
-
-    // Handle Input Changes
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+        setFormData((prevData) => ({ ...prevData, [name]: value }));
     };
 
-    // Handle Register
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setFormData((prevData) => ({ ...prevData, profilePicture: file }));
+            setPreviewImage(URL.createObjectURL(file));
+        }
+    };
+
     const handleSubmit = async (e) => {
-        e.preventDefault(); 
-        setError(""); 
-        setSuccess(false); 
+        e.preventDefault();
+        setError("");
+        setSuccess(false);
 
         if (formData.password !== formData.confirm_password) {
             setError("Passwords do not match.");
             return;
         }
 
+        const data = new FormData();
+        for (const key in formData) {
+            data.append(key, formData[key]);
+        }
+
         try {
             const response = await fetch("http://localhost:3000/api/users/register", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    fullname: formData.fullname,
-                    address: formData.address,
-                    phone: formData.phone,
-                    email: formData.email,
-                    password: formData.password,
-                    confirm_password:formData.password
-                }),
+                body: data,
             });
 
-            const data = await response.json();
-
+            const result = await response.json();
             if (response.ok) {
-                setEmailVerificationSent(true); // Show email verification UI
+                setEmailVerificationSent(true);
             } else {
-                setError(data.message || "Something went wrong. Please try again.");
+                setError(result.message || "Something went wrong. Please try again.");
             }
-        } catch (error) {
+        } catch (err) {
             setError("An error occurred. Please try again later.");
         }
     };
 
-    // Handle Email Verification
     const handleVerifyEmail = async () => {
+        setError("");
+
         try {
-            const response = await fetch("http://localhost:3000/api/users/verify", {
+            const response = await fetch("http://localhost:3000/api/users/verify-otp", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     email: formData.email,
-                    code: verificationCode,
+                    otp: verificationCode,
                 }),
             });
 
             const data = await response.json();
-
             if (response.ok) {
                 setEmailVerified(true);
-                setSuccess(true); // Show success message
-                setTimeout(() => navigate("/signin"), 2000); // Redirect after success
+                setSuccess(true);
+                setTimeout(() => navigate("/signin"), 2000);
             } else {
                 setError(data.message || "Verification failed.");
             }
-        } catch (error) {
+        } catch (err) {
+            setError("An error occurred. Please try again later.");
+        }
+    };
+
+    const handleResendOTP = async () => {
+        setError("");
+        try {
+            const response = await fetch("http://localhost:3000/api/users/resend-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: formData.email }),
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                setSuccess(true);
+                setError("A new OTP has been sent to your email.");
+            } else {
+                setError(data.message || "Unable to resend OTP. Please try again.");
+            }
+        } catch (err) {
             setError("An error occurred. Please try again later.");
         }
     };
@@ -115,139 +128,92 @@ const SignUp = () => {
                     Please create your account to continue.
                 </p>
 
-                {/* Error Message */}
                 {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-
-                {/* Success Message */}
                 {success && (
                     <p className="text-green-500 text-center mb-4">
-                        Verification successful! Redirecting to login...
+                        {emailVerified ? "Verification successful! Redirecting..." : "OTP sent successfully!"}
                     </p>
                 )}
 
                 {!emailVerificationSent ? (
                     <form onSubmit={handleSubmit}>
-                        {/* Full Name Input */}
-                        <div className="form-control mb-2">
-                            <label className="label">
-                                <span className="label-text text-gray-800">Full Name</span>
-                            </label>
-                            <input
-                                type="text"
-                                name="fullname"
-                                placeholder="Enter your full name"
-                                value={formData.fullname}
-                                onChange={handleChange}
-                                className="input input-bordered focus:outline-none focus:ring-2 focus:ring-teal-500"
-                                required
-                            />
-                        </div>
-
-                        {/* Address Input */}
-                        <div className="form-control mb-2">
-                            <label className="label">
-                                <span className="label-text text-gray-800">Address</span>
-                            </label>
-                            <input
-                                type="text"
-                                name="address"
-                                placeholder="Enter your address"
-                                value={formData.address}
-                                onChange={handleChange}
-                                className="input input-bordered focus:outline-none focus:ring-2 focus:ring-teal-500"
-                                required
-                            />
-                        </div>
-
-                        {/* Phone Number Input */}
-                        <div className="form-control mb-2">
-                            <label className="label">
-                                <span className="label-text text-gray-800">Phone Number</span>
-                            </label>
-                            <input
-                                type="tel"
-                                name="phone"
-                                placeholder="Enter your phone number"
-                                value={formData.phone}
-                                onChange={handleChange}
-                                className="input input-bordered focus:outline-none focus:ring-2 focus:ring-teal-500"
-                                required
-                            />
-                        </div>
-
-                        {/* Email Input */}
-                        <div className="form-control mb-2">
-                            <label className="label">
-                                <span className="label-text text-gray-800">Email</span>
-                            </label>
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder="Enter your email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                className="input input-bordered focus:outline-none focus:ring-2 focus:ring-teal-500"
-                                required
-                            />
-                        </div>
-
-                        {/* Password Input */}
-                        <div className="form-control mb-2">
-                            <label className="label">
-                                <span className="label-text text-gray-800">Password</span>
-                            </label>
-                            <div className="relative">
+                        {/* Profile Picture Upload */}
+                        <div className="flex justify-center mb-4">
+                            <label htmlFor="profilePicture" className="cursor-pointer">
+                                <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-teal-500">
+                                    {previewImage ? (
+                                        <img
+                                            src={previewImage}
+                                            alt="Profile Preview"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                                            <span className="text-gray-500">Upload</span>
+                                        </div>
+                                    )}
+                                </div>
                                 <input
-                                    type={showPassword ? "text" : "password"}
-                                    name="password"
-                                    placeholder="Enter your password"
-                                    value={formData.password}
+                                    type="file"
+                                    id="profilePicture"
+                                    name="profilePicture"
+                                    onChange={handleImageChange}
+                                    className="hidden"
+                                    accept="image/*"
+                                />
+                            </label>
+                        </div>
+
+                        {/* Input Fields */}
+                        {["fullname", "address", "phone", "email"].map((field) => (
+                            <div className="form-control mb-2" key={field}>
+                                <label className="label">
+                                    <span className="label-text text-gray-800 capitalize">{field}</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name={field}
+                                    placeholder={`Enter your ${field}`}
+                                    value={formData[field]}
                                     onChange={handleChange}
-                                    className="input input-bordered focus:outline-none focus:ring-2 focus:ring-teal-500 w-full pr-10"
+                                    className="input input-bordered focus:outline-none focus:ring-2 focus:ring-teal-500"
                                     required
                                 />
-                                <span
-                                    className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-600 hover:text-gray-800"
-                                    onClick={togglePasswordVisibility}
-                                >
-                                    {/* Eye Icon */}
-                                </span>
                             </div>
-                        </div>
+                        ))}
 
-                        {/* Confirm Password Input */}
-                        <div className="form-control mb-3">
-                            <label className="label">
-                                <span className="label-text text-gray-800">Confirm Password</span>
-                            </label>
-                            <div className="relative">
-                                <input
-                                    type={showConfirmPassword ? "text" : "password"}
-                                    name="confirm_password"
-                                    placeholder="Confirm your password"
-                                    value={formData.confirm_password}
-                                    onChange={handleChange}
-                                    className="input input-bordered focus:outline-none focus:ring-2 focus:ring-teal-500 w-full pr-10"
-                                    required
-                                />
-                                <span
-                                    className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-600 hover:text-gray-800"
-                                    onClick={toggleConfirmPasswordVisibility}
-                                >
-                                    {/* Eye Icon */}
-                                </span>
+                        {/* Password Fields */}
+                        {[
+                            { name: "password", show: showPassword, toggle: togglePasswordVisibility },
+                            { name: "confirm_password", show: showConfirmPassword, toggle: toggleConfirmPasswordVisibility },
+                        ].map(({ name, show, toggle }) => (
+                            <div className="form-control mb-2" key={name}>
+                                <label className="label">
+                                    <span className="label-text text-gray-800 capitalize">{name.replace("_", " ")}</span>
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type={show ? "text" : "password"}
+                                        name={name}
+                                        placeholder={`Enter your ${name.replace("_", " ")}`}
+                                        value={formData[name]}
+                                        onChange={handleChange}
+                                        className="input input-bordered focus:outline-none focus:ring-2 focus:ring-teal-500 w-full pr-10"
+                                        required
+                                    />
+                                    <span
+                                        className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-600 hover:text-gray-800"
+                                        onClick={toggle}
+                                    >
+                                        {show ? "🙈" : "👁️"}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
+                        ))}
 
-                        {/* Signup Button */}
-                        <div className="form-control">
-                            <button
-                                type="submit"
-                                className="btn bg-teal-500 hover:bg-teal-600 text-white border-0 w-full"
-                            >
-                                Sign Up
-                            </button>
-                        </div>
+                        <button type="submit" className="btn bg-teal-500 hover:bg-teal-600 text-white border-0 w-full">
+                            Sign Up
+                        </button>
                     </form>
                 ) : (
                     <div className="form-control">
@@ -267,10 +233,15 @@ const SignUp = () => {
                         >
                             Verify Email
                         </button>
+                        <button
+                            onClick={handleResendOTP}
+                            className="btn bg-gray-500 hover:bg-gray-600 text-white border-0 mt-3"
+                        >
+                            Resend OTP
+                        </button>
                     </div>
                 )}
 
-                {/* Redirect to Login */}
                 <div className="mt-4 text-center">
                     <p className="text-gray-800">
                         Already have an account?{" "}
