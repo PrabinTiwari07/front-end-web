@@ -38,7 +38,7 @@ const Signin = () => {
                 localStorage.setItem("userToken", data.token);
 
                 // Redirect to homepage
-                navigate("/"); // Replace with your homepage route
+                navigate("/");
             } else {
                 // Show error message if login fails
                 setError(data.message || "Login failed. Please try again.");
