@@ -1,109 +1,55 @@
-// import React from "react";
-// import { Route, Routes } from "react-router-dom";
-// import Sidebar from "../../components/sidebar";
-// import Analytics from "./analytics";
-// import Customers from "./customers";
-// import Employees from "./employees";
-// import Orders from "./orders";
-// import Services from "./services";
-// import Settings from "./settings";
-
-// const Dashboard = () => {
-//     return (
-//         <div className="flex h-screen bg-gray-100">
-//             {/* Sidebar Component */}
-//             <Sidebar />
-
-//             {/* Main Content */}
-//             <div className="flex-1 p-5">
-//                 {/* Topbar */}
-//                 <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow mb-5">
-//                     <input
-//                         type="text"
-//                         placeholder="Search"
-//                         className="input input-bordered w-1/3"
-//                     />
-//                     <div className="flex items-center space-x-4">
-//                         <span className="text-lg font-semibold">Prabin</span>
-//                         <div className="avatar">
-//                             <div className="w-10 rounded-full">
-//                                 <img
-//                                     src="https://via.placeholder.com/40"
-//                                     alt="Profile"
-//                                 />
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
-
-//                 {/* Quick Actions */}
-//                 <div className="grid grid-cols-4 gap-4 mb-5">
-//                     <button className="btn btn-primary">Clothes</button>
-//                     <button className="btn btn-primary">Pants</button>
-//                     <button className="btn btn-primary">Jackets</button>
-//                     <button className="btn btn-primary">See More</button>
-//                 </div>
-
-//                 {/* Routes for Dashboard Sub-Pages */}
-//                 <Routes>
-//                     <Route path="/" element={<Orders />} /> 
-//                     <Route path="/orders" element={<Orders />} />
-//                     <Route path="/customers" element={<Customers />} />
-//                     <Route path="/services" element={<Services />} />
-//                     <Route path="/analytics" element={<Analytics />} />
-//                     <Route path="/settings" element={<Settings />} />
-//                     <Route path="/employees" element={<Employees />} />
-//                 </Routes>
-
-//                 {/* Stats */}
-//                 <div className="flex justify-between mt-5">
-//                     <div className="bg-white p-5 rounded-lg shadow flex items-center space-x-4">
-//                         <div className="badge badge-success p-3">100</div>
-//                         <span>Orders Completed</span>
-//                     </div>
-//                     <div className="bg-white p-5 rounded-lg shadow flex items-center space-x-4">
-//                         <div className="badge badge-error p-3">10</div>
-//                         <span>Orders Cancelled</span>
-//                     </div>
-//                 </div>
-
-//                 {/* Graphs */}
-//                 <div className="grid grid-cols-2 gap-4 mt-5">
-//                     <div className="bg-white p-5 rounded-lg shadow">
-//                         <h2 className="text-lg font-bold mb-3">Status of Orders</h2>
-//                         <p>Graph goes here...</p>
-//                     </div>
-//                     <div className="bg-white p-5 rounded-lg shadow">
-//                         <h2 className="text-lg font-bold mb-3">Rating</h2>
-//                         <p>Rating graph here...</p>
-//                     </div>
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// };
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
+import AdminNavbar from "../../components/adminnavbar";
+import Sidebar from "../../components/sidebar";
 import Analytics from "./analytics";
 import Customers from "./customers";
-import DashboardLayout from "./dashboardlayout";
 import Employees from "./employees";
 import Orders from "./orders";
+import Services from "./services";
 import Settings from "./settings";
 
 const Dashboard = () => {
+    // Dark mode state
+    const [darkMode, setDarkMode] = useState(() => {
+        return localStorage.getItem("theme") === "dark";
+    });
+
+    // Effect to update the theme
+    useEffect(() => {
+        if (darkMode) {
+            document.documentElement.classList.add("dark");
+            localStorage.setItem("theme", "dark");
+        } else {
+            document.documentElement.classList.remove("dark");
+            localStorage.setItem("theme", "light");
+        }
+    }, [darkMode]);
+
     return (
-        <Routes>
-            {/* 🔥 FIXED: Use `/*` for nested routes */}
-            <Route path="/*" element={<DashboardLayout />}>
-                <Route index element={<Orders />} /> {/* Default Page */}
-                <Route path="orders" element={<Orders />} />
-                <Route path="customers" element={<Customers />} />
-                <Route path="analytics" element={<Analytics />} />
-                <Route path="settings" element={<Settings />} />
-                <Route path="employees" element={<Employees />} />
-            </Route>
-        </Routes>
+        <div className={`flex h-screen transition-all duration-300 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
+            {/* Sidebar */}
+            <Sidebar darkMode={darkMode} />
+
+            {/* Main Content Wrapper */}
+            <div className="flex-1 flex flex-col ml-60 p-20 transition-all duration-300">
+                {/* Navbar with Dark Mode Toggle */}
+                <AdminNavbar darkMode={darkMode} setDarkMode={setDarkMode} />
+
+                {/* Page Content */}
+                <div className={`p-5 mt-4 shadow-md rounded-lg transition-all duration-300 ${darkMode ? "bg-gray-800 text-white" : "bg-white text-black"}`}>
+                    <Routes>
+                        <Route path="/" element={<Orders />} />
+                        <Route path="/orders" element={<Orders />} />
+                        <Route path="/customers" element={<Customers />} />
+                        <Route path="/services" element={<Services />} />
+                        <Route path="/analytics" element={<Analytics />} />
+                        <Route path="/settings" element={<Settings />} />
+                        <Route path="/employees" element={<Employees />} />
+                    </Routes>
+                </div>
+            </div>
+        </div>
     );
 };
 
