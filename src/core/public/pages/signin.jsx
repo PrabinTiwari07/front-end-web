@@ -34,11 +34,16 @@ const Signin = () => {
             const data = await response.json();
 
             if (response.ok) {
-                // On success, save the token in localStorage (or sessionStorage)
                 localStorage.setItem("userToken", data.token);
+                localStorage.setItem("role", data.role);  // Save the role (e.g., 'admin' or 'user')
 
-                // Redirect to homepage
-                navigate("/");
+          
+                // Redirect based on the role
+                if (data.role === "admin") {
+                  navigate("/dashboard");
+                } else {
+                  navigate("/");
+                }
             } else {
                 // Show error message if login fails
                 setError(data.message || "Login failed. Please try again.");
