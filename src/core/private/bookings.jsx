@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import { Calendar, Edit, Trash2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
@@ -9,30 +11,23 @@ const Bookings = () => {
   const [editBooking, setEditBooking] = useState(null);
   const [editData, setEditData] = useState({ status: "" });
 
+  const fetchUsers = async () => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      const response = await axios.get("http://localhost:3000/api/books", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setBookings(response.data);  // Assuming the data returned are bookings
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      setError("Failed to fetch bookings. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:3000/api/books", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch bookings");
-        }
-
-        const data = await response.json();
-        setBookings(data);
-      } catch (error) {
-        setError(error.message || "Unknown error occurred.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBookings();
+    fetchUsers();
   }, []);
 
   if (loading) return <p className="text-center text-lg">Loading bookings...</p>;
