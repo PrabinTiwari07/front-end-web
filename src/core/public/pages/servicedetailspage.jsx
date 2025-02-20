@@ -1,7 +1,8 @@
-import { Dialog } from "@headlessui/react"; // For modal
+import { Dialog } from "@headlessui/react";
+import { X } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import DatePicker from "react-datepicker"; // Date picker
-import "react-datepicker/dist/react-datepicker.css"; // Date picker styles
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { useParams } from "react-router-dom";
 
 const ServiceDetailsPage = () => {
@@ -13,8 +14,8 @@ const ServiceDetailsPage = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState("");
   const [bookingMessage, setBookingMessage] = useState(null);
+  const [messageType, setMessageType] = useState(""); // 'success' or 'error'
 
-  // Fetch service details
   useEffect(() => {
     const fetchServiceDetails = async () => {
       try {
@@ -33,21 +34,71 @@ const ServiceDetailsPage = () => {
     fetchServiceDetails();
   }, [id]);
 
-  // Handle Booking Submission
+  // const handleBookingSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   if (!selectedDate || !selectedTime) {
+  //     showMessage("Please select date and time.", "error");
+  //     return;
+  //   }
+
+  //   const token = localStorage.getItem("token");
+  //   if (!token) {
+  //     showMessage("You need to log in first.", "error");
+  //     return;
+  //   }
+
+  //   try {
+  //     const response = await fetch("http://localhost:3000/api/books", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //       body: JSON.stringify({
+  //         serviceId: id,
+  //         date: selectedDate.toISOString(),
+  //         time: selectedTime,
+  //       }),
+  //     });
+
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       throw new Error(errorData.message || "Failed to book the service. Please try again.");
+  //     }
+
+  //     setIsBookingOpen(false);
+  //     showMessage("Booking confirmed successfully! Please check your booking details.", "success");
+  //   } catch (error) {
+  //     console.error("Error booking service:", error);
+  //     setIsBookingOpen(false);
+  //     showMessage(error.message, "error");
+  //   }
+  // };
+
   const handleBookingSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!selectedDate || !selectedTime) {
-      alert("Please select both date and time.");
+      showMessage("Please select date and time.", "error");
       return;
     }
-
+  
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("You need to log in first.");
+      showMessage("You need to log in first.", "error");
       return;
     }
-
+  
+    // ✅ Ensure correct payload format
+    const bookingData = {
+      serviceId: id,
+      date: selectedDate.toISOString().split("T")[0], // ✅ Format to YYYY-MM-DD
+      time: selectedTime,
+    };
+  
+    console.log("Booking Request Payload:", bookingData); // ✅ Debugging log
+  
     try {
       const response = await fetch("http://localhost:3000/api/books", {
         method: "POST",
@@ -55,26 +106,39 @@ const ServiceDetailsPage = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          serviceId: id,
-          date: selectedDate.toISOString(),
-          time: selectedTime,
-        }),
+        body: JSON.stringify(bookingData),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to book the service. Please try again.");
+  
+      const responseData = await response.json();
+      console.log("Booking Response:", responseData); // ✅ Debugging log
+  
+      if (response.ok) {
+        setIsBookingOpen(false);
+        showMessage("Booking confirmed successfully! Please check your booking details.", "success");
+        setTimeout(() => {
+          navigate("/booking-details"); // ✅ Redirect to booking history
+        }, 3000);
+        setSelectedDate(null);
+        setSelectedTime("");
+      } else {
+        showMessage(responseData.message || "Failed to book the service. Please try again.", "error");
       }
-
-      const data = await response.json();
-      setBookingMessage("Booking confirmed successfully!");
-      setIsBookingOpen(false);
-      console.log("Booking confirmed:", data);
     } catch (error) {
       console.error("Error booking service:", error);
-      alert(error.message);
+      showMessage("An unexpected error occurred. Please try again.", "error");
     }
+  };
+  
+  
+  
+
+  const showMessage = (message, type) => {
+    setBookingMessage(message);
+    setMessageType(type);
+    setTimeout(() => {
+      setBookingMessage(null);
+      setMessageType("");
+    }, 5000);
   };
 
   if (loading) return <p className="text-center text-xl py-10">Loading service details...</p>;
@@ -86,6 +150,27 @@ const ServiceDetailsPage = () => {
         <h2 className="text-4xl font-bold text-gray-800 text-center mb-12">
           {service?.title || "Service Details"}
         </h2>
+
+        {/* Success or Error Message */}
+        {bookingMessage && (
+          <div
+            className={`fixed top-4 right-4 p-4 rounded-md shadow-lg max-w-sm flex items-start ${
+              messageType === "success" ? "bg-green-100 border border-green-400 text-green-700" : "bg-red-100 border border-red-400 text-red-700"
+            }`}
+          >
+            <div className="flex-1">
+              <strong className="font-bold block mb-1">{messageType === "success" ? "Success!" : "Error!"}</strong>
+              <span>{bookingMessage}</span>
+            </div>
+            <button
+              onClick={() => setBookingMessage(null)}
+              className={`ml-4 ${messageType === "success" ? "text-green-700 hover:text-green-900" : "text-red-700 hover:text-red-900"}`}
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        )}
+
         <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
           <img
             src={service?.image ? `http://localhost:3000${service.image}` : "https://via.placeholder.com/800"}
@@ -94,8 +179,6 @@ const ServiceDetailsPage = () => {
           />
           <p className="text-gray-700 text-lg mb-4">{service?.description || "No description available."}</p>
           <p className="text-teal-600 font-bold text-2xl mb-2">Price: ${service?.price}</p>
-          {service?.location && <p className="text-gray-600 text-lg mb-2">Location: {service.location}</p>}
-          {service?.duration && <p className="text-gray-600 text-lg mb-6">Duration: {service.duration}</p>}
           <button
             className="bg-teal-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-teal-600 transition"
             onClick={() => setIsBookingOpen(true)}
@@ -104,13 +187,6 @@ const ServiceDetailsPage = () => {
           </button>
         </div>
       </div>
-
-      {/* Booking Confirmation Message */}
-      {bookingMessage && (
-        <div className="mt-6 text-center text-green-600 font-semibold">
-          {bookingMessage}
-        </div>
-      )}
 
       {/* Booking Modal */}
       <Dialog open={isBookingOpen} onClose={() => setIsBookingOpen(false)} className="relative z-50">
@@ -127,7 +203,7 @@ const ServiceDetailsPage = () => {
                   className="w-full px-4 py-2 border rounded-lg"
                   placeholderText="Select a date"
                   dateFormat="MMMM d, yyyy"
-                  minDate={new Date()} // Prevent selecting past dates
+                  minDate={new Date()}
                 />
               </div>
               <div className="mb-4">
