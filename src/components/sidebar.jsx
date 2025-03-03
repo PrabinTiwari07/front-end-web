@@ -1,33 +1,58 @@
-import React, { useEffect, useState } from "react";
-import { FaChartBar, FaCog, FaServicestack, FaShoppingCart, FaSignOutAlt, FaThLarge, FaUser } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
+import React, { useEffect } from "react";
+import {
+    FaServicestack, FaShoppingCart,
+    FaSignOutAlt, FaThLarge, FaUser
+} from "react-icons/fa";
+import { NavLink, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const Sidebar = () => {
-    const [darkMode, setDarkMode] = useState(() => {
-        return localStorage.getItem("theme") === "dark";
-    });
+const Sidebar = ({ darkMode }) => {
+    const navigate = useNavigate();
 
-    // Effect to update the theme
     useEffect(() => {
-        if (darkMode) {
-            document.documentElement.classList.add("dark");
-            localStorage.setItem("theme", "dark");
-        } else {
-            document.documentElement.classList.remove("dark");
-            localStorage.setItem("theme", "light");
-        }
+        document.documentElement.setAttribute("data-theme", darkMode ? "dark" : "light");
     }, [darkMode]);
 
+    const handleLogout = () => {
+        toast.info(
+            <div className="p-4 rounded-md">
+                <p className="text-lg font-semibold text-gray-800">Are you sure you want to log out?</p>
+                <div className="flex justify-end mt-4 space-x-3">
+                    <button 
+                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-200"
+                        onClick={() => toast.dismiss()}
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-200"
+                        onClick={confirmLogout}
+                    >
+                        Yes, Logout
+                    </button>
+                </div>
+            </div>, 
+            { autoClose: false, closeOnClick: false }
+        );
+    };
+
+const confirmLogout = () => {
+    localStorage.removeItem("adminToken"); 
+    localStorage.setItem("logoutSuccess", "true"); 
+    toast.dismiss(); 
+    navigate("/signin"); 
+};
+
+
     return (
-        <div className={`w-64 h-screen fixed top-4 left-4 rounded-2xl transition-all duration-300 shadow-lg 
-            ${darkMode ? "bg-gray-900 text-white" : "bg-teal-500 text-white"}`}>
-            
-            {/* Logo */}
+        <div className={`absolute top-0 left-0 m-4 w-64 h-[95vh] rounded-3xl transition-all duration-300 shadow-lg z-50
+            ${darkMode ? "bg-teal-700 text-white" : "bg-teal-500 text-white"}`}>
+
             <div className="flex items-center justify-center py-6">
                 <h2 className="text-2xl font-bold">CleanEase</h2>
             </div>
 
-            {/* Navigation */}
             <nav className="flex-1">
                 <ul className="space-y-4 p-4">
                     <li>
@@ -53,33 +78,18 @@ const Sidebar = () => {
                             <span className="text-lg">Customers</span>
                         </NavLink>
                     </li>
+                  
                     <li>
-                        <NavLink to="/dashboard/orders" className={({ isActive }) => 
+                        <NavLink to="/dashboard/bookings" className={({ isActive }) => 
                             `flex items-center space-x-3 p-3 rounded-lg transition ${
                                 isActive ? "bg-white text-teal-600 font-bold" : "hover:bg-white hover:bg-opacity-20"
-                            }`}>
+                            }` }>
                             <FaShoppingCart className="text-xl" />
-                            <span className="text-lg">Orders</span>
+                            <span className="text-lg">Bookings</span>
                         </NavLink>
                     </li>
-                    <li>
-                        <NavLink to="/dashboard/settings" className={({ isActive }) => 
-                            `flex items-center space-x-3 p-3 rounded-lg transition ${
-                                isActive ? "bg-white text-teal-600 font-bold" : "hover:bg-white hover:bg-opacity-20"
-                            }`}>
-                            <FaCog className="text-xl" />
-                            <span className="text-lg">Settings</span>
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/dashboard/analytics" className={({ isActive }) => 
-                            `flex items-center space-x-3 p-3 rounded-lg transition ${
-                                isActive ? "bg-white text-teal-600 font-bold" : "hover:bg-white hover:bg-opacity-20"
-                            }`}>
-                            <FaChartBar className="text-xl" />
-                            <span className="text-lg">Analytics</span>
-                        </NavLink>
-                    </li>
+
+                 
                     <li>
                         <NavLink to="/dashboard/services" className={({ isActive }) => 
                             `flex items-center space-x-3 p-3 rounded-lg transition ${
@@ -92,9 +102,11 @@ const Sidebar = () => {
                 </ul>
             </nav>
 
-            {/* Logout */}
             <div className="p-4">
-                <div className="flex items-center space-x-3 p-3 bg-red-500 hover:bg-red-600 transition cursor-pointer rounded-lg">
+                <div 
+                    className="flex items-center space-x-3 p-3 bg-red-500 hover:bg-red-600 transition cursor-pointer rounded-lg"
+                    onClick={handleLogout}
+                >
                     <FaSignOutAlt className="text-xl" />
                     <span className="text-lg">Logout</span>
                 </div>

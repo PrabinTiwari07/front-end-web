@@ -4,27 +4,25 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 export const colors = {
-  primary: "#2DD4BF", // teal-400 (brighter teal)
-  primaryHover: "#26A69A", // teal-500
-  secondary: "#6366F1", // indigo-500
-  secondaryHover: "#4F46E5", // indigo-600
-  accent: "#A78BFA", // purple-400
-  background: "#F8FAFC", // slate-50
+  primary: "#0D9488", // teal-600
+  primaryHover: "#0F766E", // teal-700
+  secondary: "#4F46E5", // indigo-600
+  secondaryHover: "#4338CA", // indigo-700
+  accent: "#9333EA", // purple-600
+  background: "#F1F5F9", // slate-100
   cardBg: "#FFFFFF", // white
   text: "#1E293B", // slate-800
   textLight: "#64748B", // slate-500
-  success: "#10B981", // emerald-500
-  error: "#F43F5E", // rose-500
+  success: "#059669", // emerald-600
+  error: "#DC2626", // red-600
 };
 
 export const SectionHeader = ({ title, subtitle, className = "" }) => {
   return (
-    <div className={`text-center mb-8 ${className}`}>
-      <h2 className="text-4xl font-extrabold text-slate-800 bg-clip-text bg-gradient-to-r from-teal-500 to-indigo-500 mb-2 tracking-tight">
-        {title}
-      </h2>
+    <div className={`text-center mb-10 ${className}`}>
+      <h2 className="text-4xl font-extrabold text-gray-900">{title}</h2>
       {subtitle && (
-        <p className="text-lg text-slate-500 max-w-2xl mx-auto font-light leading-relaxed">
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto font-light mt-2">
           {subtitle}
         </p>
       )}
@@ -36,7 +34,7 @@ export const PrimaryButton = ({ children, onClick, className = "" }) => {
   return (
     <button
       onClick={onClick}
-      className={`bg-gradient-to-r from-teal-500 to-teal-600 text-white px-6 py-2 rounded-full font-semibold shadow-md hover:from-teal-600 hover:to-teal-700 transition-all duration-300 hover:scale-105 hover:shadow-lg ${className}`}
+      className={`bg-teal-600 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-teal-700 transition-all duration-300 ${className}`}
     >
       {children}
     </button>
@@ -47,7 +45,7 @@ export const SecondaryButton = ({ children, onClick, className = "" }) => {
   return (
     <button
       onClick={onClick}
-      className={`bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-6 py-2 rounded-full font-semibold shadow-md hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 hover:scale-105 hover:shadow-lg ${className}`}
+      className={`bg-indigo-600 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-indigo-700 transition-all duration-300 ${className}`}
     >
       {children}
     </button>
@@ -65,21 +63,21 @@ export const Card = ({
 }) => {
   return (
     <div
-      className={`bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-1 transition-all duration-500 border border-slate-100 hover:shadow-xl ${className}`}
+      className={`bg-white rounded-lg shadow-md overflow-hidden transform hover:-translate-y-1 transition-all duration-500 border border-gray-200 hover:shadow-lg ${className}`}
     >
       {image && (
-        <div className="w-full h-48 overflow-hidden">
+        <div className="w-full h-52 overflow-hidden">
           <img
             src={image}
             alt={title}
-            className="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500"
+            className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
           />
         </div>
       )}
       <div className="p-5 text-center">
-        <h3 className="text-xl font-semibold text-slate-800 mb-2">{title}</h3>
-        <p className="text-slate-500 leading-relaxed text-sm">{description}</p>
-        {price && <p className="text-teal-500 font-bold text-lg mt-2">${price}</p>}
+        <h3 className="text-xl font-semibold text-gray-800 mb-2">{title}</h3>
+        <p className="text-gray-600 leading-relaxed text-sm">{description}</p>
+        {price && <p className="text-teal-600 font-bold text-lg mt-2">${price}</p>}
         {buttonText && buttonLink && (
           <Link to={buttonLink}>
             <PrimaryButton className="mt-3">{buttonText}</PrimaryButton>
@@ -90,16 +88,15 @@ export const Card = ({
   );
 };
 
-export const PageContainer = ({ children, bgColor = "bg-transparent", className = "" }) => {
-    return (
-      <div className={`flex flex-col min-h-screen ${bgColor} ${className}`}>
-        <Navbar />
-        <main className="flex-grow">{children}</main>
-        <Footer />
-      </div>
-    );
-  };
-  
+export const PageContainer = ({ children, bgColor = "bg-gray-100", className = "" }) => {
+  return (
+    <div className={`flex flex-col min-h-screen ${bgColor} ${className}`}>
+      <Navbar />
+      <main className="flex-grow">{children}</main>
+      <Footer />
+    </div>
+  );
+};
 
 export const Section = ({ children, bgColor = "bg-white", className = "" }) => {
   return (

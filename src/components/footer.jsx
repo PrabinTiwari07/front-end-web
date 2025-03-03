@@ -1,108 +1,68 @@
-import React from "react";
+
+
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
-    return (
-        <footer className="bg-teal-400 text-white py-10">
-            <div className="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 px-5">
-                {/* About Us */}
-                <div>
-                    <h6 className="font-bold text-lg mb-4">About us</h6>
-                    <p className="text-sm mb-4">
-                        Here, we offer best value to our customer with good and quality services.
-                    </p>
-                    <div className="flex space-x-3 text-lg">
-                        <a href="#" aria-label="Instagram" className="hover:text-gray-700">
-                            📷
-                        </a>
-                        <a href="#" aria-label="Telegram" className="hover:text-gray-700">
-                            📨
-                        </a>
-                        <a href="#" aria-label="Facebook" className="hover:text-gray-700">
-                            📘
-                        </a>
-                        <a href="#" aria-label="YouTube" className="hover:text-gray-700">
-                            ▶️
-                        </a>
-                        <a href="#" aria-label="LinkedIn" className="hover:text-gray-700">
-                            🔗
-                        </a>
-                    </div>
-                </div>
-
-                {/* Get in Touch */}
-                <div>
-                    <h6 className="font-bold text-lg mb-4">Get in touch</h6>
-                    <p className="text-sm mb-2">
-                        Thousands of people trusted us using this website. If you have any queries, you can contact us.
-                    </p>
-                    <p className="text-sm flex items-center">
-                        📍 Jorpati, Kathmandu
-                    </p>
-                    <p className="text-sm flex items-center">
-                        📞 +977 01452625
-                    </p>
-                    <p className="text-sm flex items-center">
-                        📧 cleanease@gmail.com
-                    </p>
-                </div>
-
-                {/* Quick Links */}
-                <div>
-                    <h6 className="font-bold text-lg mb-4">Quick Links</h6>
-                    <ul className="space-y-2">
-                        <li>
-                            <a href="#" className="hover:underline">
-                                Home
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" className="hover:underline">
-                                About
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" className="hover:underline">
-                                Services
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" className="hover:underline">
-                                Pages
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" className="hover:underline">
-                                Contact
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-                {/* Newsletter */}
-                <div>
-                    <h6 className="font-bold text-lg mb-4">Newsletter</h6>
-                    <form>
-                        <input
-                            type="text"
-                            placeholder="Your Name"
-                            className="block w-full mb-2 p-2 rounded-md border border-gray-300 text-gray-900"
-                        />
-                        <input
-                            type="email"
-                            placeholder="Your Email"
-                            className="block w-full mb-2 p-2 rounded-md border border-gray-300 text-gray-900"
-                        />
-                        <button
-                            type="submit"
-                            className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-                        >
-                            Submit Now
-                        </button>
-                    </form>
-                </div>
+  return (
+    <footer className="bg-gray-800 text-white">
+      <div className="container mx-auto py-12 px-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="md:col-span-1">
+            <h3 className="text-2xl font-bold mb-4">Laundry Services</h3>
+            <p className="text-gray-400 mb-4">
+              Providing top-quality laundry services since 2024. Your clothes deserve the best care.
+            </p>
+            <div className="flex space-x-4">
+              <a href="#" className="text-white hover:text-teal-400 transition-colors">
+                <i className="fab fa-facebook"></i>
+              </a>
+              <a href="#" className="text-white hover:text-teal-400 transition-colors">
+                <i className="fab fa-twitter"></i>
+              </a>
+              <a href="#" className="text-white hover:text-teal-400 transition-colors">
+                <i className="fab fa-instagram"></i>
+              </a>
             </div>
-        </footer>
-    );
+          </div>
+
+          <div>
+            <h4 className="text-lg font-semibold mb-4 text-teal-400">Quick Links</h4>
+            <ul className="space-y-2">
+              <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Home</Link></li>
+              <li><Link to="/services" className="text-gray-300 hover:text-white transition-colors">Services</Link></li>
+              <li><Link to="/about" className="text-gray-300 hover:text-white transition-colors">About Us</Link></li>
+              <li><Link to="/contact" className="text-gray-300 hover:text-white transition-colors">Contact</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-lg font-semibold mb-4 text-teal-400">Our Services</h4>
+            <ul className="space-y-2">
+              <li><Link to="/services" className="text-gray-300 hover:text-white transition-colors">Laundry</Link></li>
+              <li><Link to="/services" className="text-gray-300 hover:text-white transition-colors">Iron</Link></li>
+              <li><Link to="/services" className="text-gray-300 hover:text-white transition-colors">Shoe Cleaning</Link></li>
+              <li><Link to="/services" className="text-gray-300 hover:text-white transition-colors">Special Care</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-lg font-semibold mb-4 text-teal-400">Contact Us</h4>
+            <address className="not-italic text-gray-300">
+              <p className="mb-2">Clean Ease</p>
+              <p className="mb-2">City, Jorpati</p>
+              <p className="mb-2">Phone: 9869028215</p>
+              <p>Email: cleanease@gmail.com</p>
+            </address>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-700 mt-10 pt-6 text-center text-gray-400">
+          <p>&copy; {new Date().getFullYear()} Laundry Services. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  );
 };
 
 export default Footer;

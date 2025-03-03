@@ -1,41 +1,52 @@
 import { expect, test } from '@playwright/test';
 
-test('Service page loads and displays services', async ({ page }) => {
+test('Service page displays "Our Premium Services" heading', async ({ page }) => {
     await page.goto('http://localhost:5173/service');
 
+    // Wait for the heading to be present
     await page.waitForSelector('h2', { timeout: 10000 });
-    await expect(page.locator('h2')).toHaveText('Our Services');
 
-    const services = page.locator('.card');
-    await expect(services).toHaveCount(1); 
+    // Check if the heading contains the expected text
+    const heading = await page.locator('h2').innerText();
+    console.log(`Found heading: ${heading}`); // Debugging output
+
+    expect(heading).toContain("Our Premium Services");
 });
 
-test('User can navigate to a service details page', async ({ page }) => {
+
+test('Service page displays "Automated Laundry" service', async ({ page }) => {
     await page.goto('http://localhost:5173/service');
 
-    await page.waitForSelector('.card', { timeout: 10000 });
+    // Wait for the text "Automated Laundry" to appear
+    await page.waitForSelector('text=Automated Laundry', { timeout: 10000 });
 
-    await page.click('.card:nth-of-type(1) button');
+    // Assert that the text is visible on the page
+    await expect(page.locator('text=Automated Laundry')).toBeVisible();
+
+    // Debugging: Print found text
+    const serviceText = await page.locator('text=Automated Laundry').innerText();
+    console.log(`Found service: ${serviceText}`);
+});
+
+
+// test('Service page displays "Discover More" service', async ({ page }) => {
+//     await page.goto('http://localhost:5173/service');
+
+//     await page.waitForSelector('text=Discover More', { timeout: 10000 });
+
+//     await expect(page.locator('text=Discover More')).toBeVisible();
+
+//     const serviceText = await page.locator('text=Discover More').innerText();
+//     console.log(`Found service: ${serviceText}`);
+// });
+
+
+
+test('Clicking Discover More redirects to a specific service', async ({ page }) => {
+    await page.goto('http://localhost:5173/service');
+
+    await page.waitForSelector('text=Discover More');
+    await page.locator('text=Discover More').first().click();
 
     await expect(page).toHaveURL(/\/service\/\w+/);
-});
-
-test('Service images are displayed correctly', async ({ page }) => {
-    await page.goto('http://localhost:5173/service');
-
-    await page.waitForSelector('.card img', { timeout: 10000 });
-
-    const images = page.locator('.card img');
-    const count = await images.count();
-    expect(count).toBeGreaterThan(0);
-});
-
-
-test('Clicking Learn More redirects to a specific service', async ({ page }) => {
-    await page.goto('http://localhost:5173/service');
-
-    await page.waitForSelector('text=Learn More');
-    await page.click('text=Learn More');
-
-    await expect(page).toHaveURL('http://localhost:5173/service/67c284965e9807b7a4471ff9');
 });

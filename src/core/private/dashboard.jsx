@@ -3,19 +3,15 @@ import { Route, Routes } from "react-router-dom";
 import AdminNavbar from "../../components/adminnavbar";
 import Sidebar from "../../components/sidebar";
 import Analytics from "./analytics";
+import Bookings from "./bookings";
 import Customers from "./customers";
-import Employees from "./employees";
-import Orders from "./orders";
 import Services from "./services";
-import Settings from "./settings";
 
 const Dashboard = () => {
-    // Dark mode state
     const [darkMode, setDarkMode] = useState(() => {
         return localStorage.getItem("theme") === "dark";
     });
 
-    // Effect to update the theme
     useEffect(() => {
         if (darkMode) {
             document.documentElement.classList.add("dark");
@@ -28,24 +24,18 @@ const Dashboard = () => {
 
     return (
         <div className={`flex h-screen transition-all duration-300 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
-            {/* Sidebar */}
-            <Sidebar darkMode={darkMode} />
+=            <Sidebar darkMode={darkMode} setDarkMode={setDarkMode} className="fixed top-4 left-72 right-4 rounded-2xl shadow-lg z-50" />
 
-            {/* Main Content Wrapper */}
-            <div className="flex-1 flex flex-col ml-60 p-20 transition-all duration-300">
-                {/* Navbar with Dark Mode Toggle */}
-                <AdminNavbar darkMode={darkMode} setDarkMode={setDarkMode} />
+            <div className="flex-1 flex flex-col ml-72 p-6 transition-all duration-300">
+                <AdminNavbar darkMode={darkMode} setDarkMode={setDarkMode} className="fixed top-4 left-72 right-4 rounded-2xl shadow-lg z-50" />
 
-                {/* Page Content */}
-                <div className={`p-5 mt-4 shadow-md rounded-lg transition-all duration-300 ${darkMode ? "bg-gray-800 text-white" : "bg-white text-black"}`}>
+                <div className={`p-5 mt-20 shadow-md rounded-lg transition-all duration-300 ${darkMode ? "bg-gray-800 text-white" : "bg-white text-black"}`}>
                     <Routes>
-                        <Route path="/" element={<Orders />} />
-                        <Route path="/orders" element={<Orders />} />
+                        <Route path="/" element={<Analytics />} />
+                        <Route path="/bookings" element={<Bookings />} />
                         <Route path="/customers" element={<Customers />} />
                         <Route path="/services" element={<Services />} />
                         <Route path="/analytics" element={<Analytics />} />
-                        <Route path="/settings" element={<Settings />} />
-                        <Route path="/employees" element={<Employees />} />
                     </Routes>
                 </div>
             </div>

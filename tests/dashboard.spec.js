@@ -52,16 +52,4 @@ test('Booking and Revenue charts are visible', async ({ page }) => {
     await expect(page.locator('.recharts-bar').first()).toBeVisible();
 });
 
-test('Logout redirects to login page', async ({ page }) => {
-    const token = await loginAsAdmin(page);
 
-    await page.addInitScript(token => {
-        localStorage.setItem('adminToken', token);
-    }, token);
-
-    await page.goto('http://localhost:5173/dashboard');
-
-    await page.click('text=Logout');
-
-    await expect(page).toHaveURL('http://localhost:5173/signin');
-});

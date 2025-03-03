@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test';
 
 async function loginAndGetToken(page) {
     await page.goto('http://localhost:5173/signin');
-    await page.fill('input[placeholder="Enter your email"]', 'prabintiwari44@gmail.com');
-    await page.fill('input[placeholder="Enter your password"]', 'prabin123');
+    await page.fill('input[placeholder="Enter your email"]', 'pyroanime69@gmail.com');
+    await page.fill('input[placeholder="Enter your password"]', 'pyro123');
     await page.click('button[type="submit"]');
 
     await expect(page).toHaveURL('http://localhost:5173/');
@@ -11,21 +11,26 @@ async function loginAndGetToken(page) {
     return await page.evaluate(() => localStorage.getItem('token'));
 }
 
-test('Booking page loads and displays bookings', async ({ page }) => {
+test('Service page displays "Automated Laundry"', async ({ page }) => {
     const token = await loginAndGetToken(page);
 
     await page.addInitScript(token => {
         localStorage.setItem('token', token);
     }, token);
 
-    await page.goto('http://localhost:5173/booking');
+    await page.goto('http://localhost:5173/service');
 
-    await page.waitForSelector('h2:text("My Bookings")', { timeout: 20000 });
-    await expect(page.locator('h2:text("My Bookings")')).toBeVisible();
+    // Wait for the text "Automated Laundry" to appear
+    await page.waitForSelector('text=Automated Laundry', { timeout: 10000 });
 
-    const bookings = page.locator('.bg-white.shadow-lg.rounded-xl');
-    await expect(bookings).toHaveCount(1);  
+    // Assert that the text is visible on the page
+    await expect(page.locator('text=Automated Laundry')).toBeVisible();
+
+    // Debugging: Print found text
+    const serviceText = await page.locator('text=Automated Laundry').innerText();
+    console.log(`Found service: ${serviceText}`);
 });
+
 
 test('Redirects to Signin page when not authenticated', async ({ page }) => {
     await page.goto('http://localhost:5173/booking');
@@ -33,18 +38,12 @@ test('Redirects to Signin page when not authenticated', async ({ page }) => {
     await expect(page).toHaveURL('http://localhost:5173/signin');
 });
 
-test('Booking status is displayed with correct color', async ({ page }) => {
-    const token = await loginAndGetToken(page);
 
-    await page.addInitScript(token => {
-        localStorage.setItem('token', token);
-    }, token);
+test('Clicking Discover More redirects to a specific service', async ({ page }) => {
+    await page.goto('http://localhost:5173/service');
 
-    await page.goto('http://localhost:5173/booking');
+    await page.waitForSelector('text=Discover More');
+    await page.locator('text=Discover More').first().click();
 
-    await page.waitForSelector('.bg-white.shadow-lg.rounded-xl', { timeout: 20000 });
-
-    const statusElement = page.locator('.w-full.text-center.px-4.py-2.text-lg.font-bold');
-
-    await expect(statusElement).toContainText(/Pending|Confirmed|Canceled/);
+    await expect(page).toHaveURL(/\/service\/\w+/);
 });

@@ -1,7 +1,9 @@
 import axios from "axios";
-
 import { Calendar, Edit, Trash2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { io } from "socket.io-client";
 
 const Bookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -11,24 +13,82 @@ const Bookings = () => {
   const [editBooking, setEditBooking] = useState(null);
   const [editData, setEditData] = useState({ status: "" });
 
-  const fetchUsers = async () => {
+  const fetchBookings = async () => {
     try {
       const token = localStorage.getItem("adminToken");
       const response = await axios.get("http://localhost:3000/api/books", {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
-      setBookings(response.data);  // Assuming the data returned are bookings
+      setBookings(response.data);
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error("Error fetching bookings:", error);
       setError("Failed to fetch bookings. Please try again.");
+      toast.error("❌ Failed to fetch bookings!");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchBookings();
   }, []);
+
+  useEffect(() => {
+    const socket = io("http://localhost:3000");
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  const handleSaveEdit = async (bookingId) => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      const response = await axios.put(
+        `http://localhost:3000/api/books/${bookingId}/status`,
+        { status: editData.status },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setBookings((prev) =>
+        prev.map((booking) =>
+          booking._id === bookingId ? { ...booking, status: editData.status } : booking
+        )
+      );
+      toast.success(" Booking status updated successfully!");
+      setEditBooking(null);
+
+      const updatedBooking = bookings.find((booking) => booking._id === bookingId);
+      if (updatedBooking) {
+        const socket = io("http://localhost:3000");
+        socket.emit("sendNotification", {
+          userId: updatedBooking.userId._id,
+          message: `Your status for ${updatedBooking.serviceId.title} is ${editData.status}.`,
+          isRead: false,
+        });
+      }
+    } catch (error) {
+      console.error("Error updating booking status:", error.response?.data || error);
+      toast.error("❌ Failed to update booking status!");
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "confirmed":
+        return "text-green-600";
+      case "pending":
+        return "text-yellow-600";
+      case "canceled":
+        return "text-red-600";
+      default:
+        return "text-gray-600";
+    }
+  };
 
   if (loading) return <p className="text-center text-lg">Loading bookings...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
@@ -70,7 +130,7 @@ const Bookings = () => {
                     <td className="flex space-x-2">
                       <button
                         className="btn btn-primary btn-sm"
-                        onClick={() => handleEdit(booking)}
+                        onClick={() => setEditBooking(booking)}
                       >
                         <Edit className="inline-block" />
                       </button>
@@ -89,16 +149,16 @@ const Bookings = () => {
         </div>
       </div>
 
-      {/* Edit Booking Modal */}
       {editBooking && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-base-100 p-5 rounded shadow-lg w-full max-w-sm">
+          <div className="bg-white p-5 rounded shadow-lg w-full max-w-sm">
             <h3 className="text-lg font-bold">Edit Booking Status</h3>
             <select
               className="input input-bordered w-full mt-4"
               value={editData.status}
               onChange={(e) => setEditData({ status: e.target.value })}
             >
+              <option value="">-- Select Status --</option> 
               <option value="pending">Pending</option>
               <option value="confirmed">Confirmed</option>
               <option value="canceled">Canceled</option>
@@ -114,80 +174,8 @@ const Bookings = () => {
           </div>
         </div>
       )}
-
-      {/* Delete Confirmation Modal */}
-      {deleteBookingId && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-base-100 p-5 rounded shadow-lg w-full max-w-sm">
-            <h3 className="text-lg font-bold">
-              Are you sure you want to delete this booking?
-            </h3>
-            <div className="flex justify-end mt-4 space-x-2">
-              <button className="btn btn-gray" onClick={() => setDeleteBookingId(null)}>
-                No
-              </button>
-              <button className="btn btn-red" onClick={() => handleDelete(deleteBookingId)}>
-                Yes
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
-
-  function getStatusColor(status) {
-    switch (status) {
-      case "confirmed":
-        return "text-green-600";
-      case "pending":
-        return "text-yellow-600";
-      case "canceled":
-        return "text-red-600";
-      default:
-        return "text-gray-600";
-    }
-  }
-
-  function handleEdit(booking) {
-    setEditBooking(booking);
-    setEditData({ status: booking.status });
-  }
-
-  async function handleSaveEdit(bookingId) {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:3000/api/books/${bookingId}/status`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ status: editData.status }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update booking status");
-      }
-
-      setBookings((prev) =>
-        prev.map((booking) =>
-          booking._id === bookingId ? { ...booking, status: editData.status } : booking
-        )
-      );
-      alert("Booking status updated successfully");
-      setEditBooking(null);
-    } catch (error) {
-      console.error("Error updating booking status:", error);
-      alert("Error updating booking status. Please try again.");
-    }
-  }
-
-  async function handleDelete(bookingId) {
-    setBookings((prev) => prev.filter((booking) => booking._id !== bookingId));
-    alert("Booking deleted successfully!");
-    setDeleteBookingId(null);
-  }
 };
 
 export default Bookings;

@@ -137,34 +137,8 @@ const SignUp = () => {
 
                 {!emailVerificationSent ? (
                     <form onSubmit={handleSubmit}>
-                        {/* Profile Picture Upload */}
-                        <div className="flex justify-center mb-4">
-                            <label htmlFor="profilePicture" className="cursor-pointer">
-                                <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-teal-500">
-                                    {previewImage ? (
-                                        <img
-                                            src={previewImage}
-                                            alt="Profile Preview"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                                            <span className="text-gray-500">Upload</span>
-                                        </div>
-                                    )}
-                                </div>
-                                <input
-                                    type="file"
-                                    id="profilePicture"
-                                    name="profilePicture"
-                                    onChange={handleImageChange}
-                                    className="hidden"
-                                    accept="image/*"
-                                />
-                            </label>
-                        </div>
+                        
 
-                        {/* Input Fields */}
                         {["fullname", "address", "phone", "email"].map((field) => (
                             <div className="form-control mb-2" key={field}>
                                 <label className="label">
@@ -182,7 +156,6 @@ const SignUp = () => {
                             </div>
                         ))}
 
-                        {/* Password Fields */}
                         {[
                             { name: "password", show: showPassword, toggle: togglePasswordVisibility },
                             { name: "confirm_password", show: showConfirmPassword, toggle: toggleConfirmPasswordVisibility },

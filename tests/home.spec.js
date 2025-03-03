@@ -1,24 +1,18 @@
 import { expect, test } from '@playwright/test';
-
-test('Home page loads and displays services', async ({ page }) => {
+test('Homepage displays "Laundry Simplified"', async ({ page }) => {
     await page.goto('http://localhost:5173/');
 
-    await page.waitForSelector('h2:text("Our Services")', { timeout: 15000 });
-    await expect(page.locator('h2:text("Our Services")')).toBeVisible();
+    // Wait for the heading "Laundry Simplified" to appear
+    await page.waitForSelector('text=Laundry Simplified', { timeout: 10000 });
 
-    const services = page.locator('.bg-white.rounded-lg.shadow-lg');
-    await expect(services).toHaveCount(1); 
+    // Assert that the text is visible on the page
+    await expect(page.locator('text=Laundry Simplified')).toBeVisible();
+
+    // Debugging: Print found text
+    const headingText = await page.locator('text=Laundry Simplified').innerText();
+    console.log(`Found heading: ${headingText}`);
 });
 
-test('User can navigate to a service details page', async ({ page }) => {
-    await page.goto('http://localhost:5173/');
-
-    await page.waitForSelector('.bg-white.rounded-lg.shadow-lg', { timeout: 15000 });
-
-    await page.click('text=Learn More');
-
-    await expect(page).toHaveURL(/\/service\/\w+/);
-});
 
 test('Navbar is visible and contains expected navigation links', async ({ page }) => {
     await page.goto('http://localhost:5173/');
@@ -34,27 +28,18 @@ test('Navbar is visible and contains expected navigation links', async ({ page }
 
 
 
-test('Footer is visible and contains expected sections', async ({ page }) => {
+test('Footer is visible and contains expected services', async ({ page }) => {
     await page.goto('http://localhost:5173/');
 
+    // Wait for the footer to be visible
     const footer = page.locator('footer');
     await footer.waitFor({ state: 'visible', timeout: 10000 });
 
-    await expect(page.locator('text=Newsletter')).toBeVisible();
-    await expect(page.locator('input[placeholder="Your Name"]')).toBeVisible();
-    await expect(page.locator('input[placeholder="Your Email"]')).toBeVisible();
-    await expect(page.locator('button:text("Submit Now")')).toBeVisible();
-});
+    // Check for "Our Services" heading
+    await expect(page.locator('text=Our Services')).toBeVisible();
 
-test('Newsletter Submit Now button is clickable', async ({ page }) => {
-    await page.goto('http://localhost:5173/');
-
-    await page.locator('footer').scrollIntoViewIfNeeded();
-    await page.waitForTimeout(500); 
-
-    await page.fill('input[placeholder="Your Name"]', 'John Doe');
-    await page.fill('input[placeholder="Your Email"]', 'johndoe@example.com');
-
-    await page.click('button:text("Submit Now")');
 
 });
+
+
+
